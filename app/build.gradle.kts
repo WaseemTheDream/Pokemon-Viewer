@@ -1,8 +1,8 @@
 plugins {
-    id("kotlin-kapt") // TODO: https://github.com/gradle/gradle/issues/20084
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hiltAndroid)
+    id("kotlin-kapt") // TODO: https://github.com/gradle/gradle/issues/20084
 }
 
 android {
@@ -65,6 +65,10 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.converter.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
