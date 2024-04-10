@@ -28,7 +28,7 @@ fun PokemonListItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = pokemon.name,
+            text = "${pokemon.id()}. ${pokemon.name}",
             style = MaterialTheme.typography.titleLarge)
     }
 }
@@ -37,6 +37,8 @@ fun PokemonListItem(
 @Composable
 fun PokemonListItemPreview() {
     PokemonListItem(
-        pokemon = Pokemon("Pikachu", ""),
+        pokemon = Pokemon(
+            name = "Pikachu",
+            url = "https://pokeapi.co/api/v2/pokemon/2/"),
         onClick = { })
 }

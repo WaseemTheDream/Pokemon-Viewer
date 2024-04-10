@@ -20,6 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.android.pokemonviewer.R
+import com.example.android.pokemonviewer.data.model.Pokemon
 import com.example.android.pokemonviewer.ui.components.ErrorMessage
 import com.example.android.pokemonviewer.ui.components.LoadingNextPageItem
 import com.example.android.pokemonviewer.ui.components.PageLoader
@@ -28,7 +29,8 @@ import com.example.android.pokemonviewer.ui.components.TitleBarText
 
 @Composable
 fun PokemonListScreen(
-    viewModel: PokemonListViewModel = hiltViewModel()
+    viewModel: PokemonListViewModel = hiltViewModel(),
+    navigateToDetailsScreen: (Pokemon) -> Unit,
 ) {
 
     Scaffold(
@@ -51,6 +53,7 @@ fun PokemonListScreen(
     ) { paddingValues ->
         PokemonListScreenContent(
             viewModel = viewModel,
+            navigateToDetailsScreen = navigateToDetailsScreen,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues))
@@ -60,6 +63,7 @@ fun PokemonListScreen(
 @Composable
 fun PokemonListScreenContent(
     viewModel: PokemonListViewModel,
+    navigateToDetailsScreen: (Pokemon) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val pokemonPagingItems = viewModel.pokemonsState.collectAsLazyPagingItems()
@@ -67,9 +71,10 @@ fun PokemonListScreenContent(
         modifier = modifier,
     ) {
         items(pokemonPagingItems.itemCount) {index ->
+            val pokemon = pokemonPagingItems[index]!!
             PokemonListItem(
-                pokemon = pokemonPagingItems[index]!!,
-                onClick = { /*TODO*/ }
+                pokemon = pokemon,
+                onClick = { navigateToDetailsScreen(pokemon) }
             )
         }
 
