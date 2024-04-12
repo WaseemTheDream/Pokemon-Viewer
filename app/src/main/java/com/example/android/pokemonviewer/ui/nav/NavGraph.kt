@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.android.pokemonviewer.data.model.Pokemon
+import com.example.android.pokemonviewer.ui.nav.AppScreenParams.PokemonDetails
 import com.example.android.pokemonviewer.ui.pokemondetails.PokemonDetailsScreen
 import com.example.android.pokemonviewer.ui.pokemonlist.PokemonListScreen
 
@@ -14,7 +15,7 @@ import com.example.android.pokemonviewer.ui.pokemonlist.PokemonListScreen
 fun NavGraph() {
     val navController = rememberNavController()
     val navigateToDetailsScreen: (Pokemon) -> Unit = {
-        navController.navigate(AppScreenRoute.pokemonDetails(it.id()))
+        navController.navigate(AppScreenRoute.pokemonDetails(it.id(), it.name))
     }
     NavHost(
         navController = navController,
@@ -28,17 +29,21 @@ fun NavGraph() {
         composable(
             route = AppScreen.PokemonDetailsScreen.route,
             arguments = listOf(
-                navArgument(AppScreenParams.PokemonDetails.POKEMON_ID) { type = NavType.StringType }
+                navArgument(PokemonDetails.POKEMON_ID) { type = NavType.StringType },
+                navArgument(PokemonDetails.POKEMON_NAME) { type = NavType.StringType },
             )
         ) {
             val pokemonId =
-                it.arguments?.getString(AppScreenParams.PokemonDetails.POKEMON_ID) ?:
+                it.arguments?.getString(PokemonDetails.POKEMON_ID) ?:
                 throw IllegalArgumentException("Missing required pokemon id")
+            val pokemonName =
+                it.arguments?.getString(PokemonDetails.POKEMON_NAME)
             val navigateBack: () -> Unit = {
                 navController.popBackStack()
             }
             PokemonDetailsScreen(
                 pokemonId = pokemonId,
+                pokemonName = pokemonName,
                 navigateBack = navigateBack)
         }
     }
