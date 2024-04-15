@@ -24,12 +24,14 @@ fun PokemonListItem(
             .wrapContentHeight()
             .fillMaxWidth()
             .clickable { onClick(pokemon) }
-            .padding(16.dp),
+            .padding(
+                horizontal = 16.dp,
+                vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = "${pokemon.id()}. ${pokemon.name}",
-            style = MaterialTheme.typography.titleLarge)
+            style = MaterialTheme.typography.bodyLarge)
     }
 }
 

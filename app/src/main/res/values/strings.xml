@@ -8,4 +8,8 @@
     <string name="inches">inches</string>
     <string name="weight">Weight</string>
     <string name="height">Height</string>
+    <string name="stats">Stats:</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+    <string name="not_found">\"%1$s\" was not found. Make sure the name is an exact match to the pokemon you are looking for.</string>
 </resources>

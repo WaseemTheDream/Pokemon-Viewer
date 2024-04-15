@@ -1,6 +1,7 @@
 package com.example.android.pokemonviewer.ui.components
 
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.android.pokemonviewer.R
+import com.example.android.pokemonviewer.data.ApiResult
 
 
 @Composable
@@ -43,17 +45,17 @@ fun ErrorMessage(
     modifier: Modifier = Modifier,
     onClickRetry: (() -> Unit)? = null,
 ) {
-    Row(
+    Column(
         modifier = modifier.padding(10.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = message,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.weight(1f),
-            maxLines = 2)
+            maxLines = 2,
+            modifier = Modifier.padding(vertical = 16.dp))
         if (onClickRetry != null) {
             OutlinedButton(onClick = onClickRetry) {
                 Text(text = stringResource(id = R.string.retry))
@@ -70,4 +72,19 @@ fun LoadingNextPageItem(modifier: Modifier = Modifier) {
             .padding(20.dp)
             .wrapContentWidth(Alignment.CenterHorizontally)
     )
+}
+
+fun ApiResult.Failure.toErrorMessage(
+    context: Context,
+    requestedResource: String,
+): String {
+    if (message != null && message.isNotBlank()) {
+        return message
+    }
+
+    if (errorCode == 404) {
+        return context.getString(R.string.not_found, requestedResource)
+    }
+
+    return context.getString(R.string.unknown_error)
 }

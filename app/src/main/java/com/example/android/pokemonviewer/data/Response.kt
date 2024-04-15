@@ -7,7 +7,7 @@ sealed class ApiResult<out T> {
     data class Success<out R>(val value: R): ApiResult<R>()
 
     data class Failure(
-        val message: String?,
-        val throwable: Throwable?
+        val message: String? = null,
+        val errorCode: Int? = null,
     ): ApiResult<Nothing>()
 }

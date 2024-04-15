@@ -17,13 +17,17 @@ fun NavGraph() {
     val navigateToDetailsScreen: (Pokemon) -> Unit = {
         navController.navigate(AppScreenRoute.pokemonDetails(it.id(), it.name))
     }
+    val navigateToSearchResults: (String) -> Unit = {
+        navController.navigate(AppScreenRoute.pokemonDetails(it, it))
+    }
     NavHost(
         navController = navController,
         startDestination = AppScreen.PokemonListScreen.route
     ) {
         composable(route = AppScreen.PokemonListScreen.route) {
             PokemonListScreen(
-                navigateToDetailsScreen = navigateToDetailsScreen
+                navigateToDetailsScreen = navigateToDetailsScreen,
+                navigateToSearchResults = navigateToSearchResults,
             )
         }
         composable(
@@ -37,7 +41,8 @@ fun NavGraph() {
                 it.arguments?.getString(PokemonDetails.POKEMON_ID) ?:
                 throw IllegalArgumentException("Missing required pokemon id")
             val pokemonName =
-                it.arguments?.getString(PokemonDetails.POKEMON_NAME)
+                it.arguments?.getString(PokemonDetails.POKEMON_NAME) ?:
+                throw IllegalArgumentException("Missing required pokemon name")
             val navigateBack: () -> Unit = {
                 navController.popBackStack()
             }

@@ -23,6 +23,7 @@ class PokemonDetailsViewModel @Inject constructor(
     val pokemonState: StateFlow<ApiResult<PokemonDetails>> = _pokemonState
 
     fun fetchDetails(id: String) {
+        _pokemonState.value = ApiResult.Loading
         viewModelScope.launch(Dispatchers.IO) {
             pokemonRepository
                 .getDetails(id)

@@ -33,13 +33,13 @@ class PokemonRepositoryImpl @Inject constructor(
             val pokemon: PokemonDetails? = response.body()
 
             if (!response.isSuccessful || pokemon == null) {
-                emit(ApiResult.Failure(response.errorBody()?.toString(), HttpException(response)))
+                emit(ApiResult.Failure(errorCode = response.code()))
                 return@flow
             }
 
             emit(ApiResult.Success(pokemon))
         } catch (exception: Exception) {
-            emit(ApiResult.Failure(exception.localizedMessage, exception))
+            emit(ApiResult.Failure(exception.localizedMessage))
         }
     }
 }

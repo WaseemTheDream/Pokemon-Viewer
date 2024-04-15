@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,19 +49,18 @@ import com.example.android.pokemonviewer.ui.components.ErrorMessage
 import com.example.android.pokemonviewer.ui.components.PageLoader
 import com.example.android.pokemonviewer.ui.components.TitleBarButton
 import com.example.android.pokemonviewer.ui.components.TitleBarText
+import com.example.android.pokemonviewer.ui.components.toErrorMessage
 
 @Composable
 fun PokemonDetailsScreen(
     pokemonId: String,
-    pokemonName: String?,
+    pokemonName: String,
     viewModel: PokemonDetailsViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
 ) {
     LaunchedEffect(pokemonId) {
         viewModel.fetchDetails(pokemonId)
     }
-
-    val pokemonState = viewModel.pokemonState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -82,34 +82,38 @@ fun PokemonDetailsScreen(
         }
     ) { paddingValues ->
         PokemonDetailsScreenContent(
-            pokemonState.value,
+            pokemonId,
+            pokemonName,
+            viewModel,
             modifier = Modifier.padding(paddingValues))
     }
 }
 
 @Composable
 fun PokemonDetailsScreenContent(
-    result: ApiResult<PokemonDetails>,
+    pokemonId: String,
+    pokemonName: String,
+    viewModel: PokemonDetailsViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = modifier
-            .verticalScroll(scrollState)
-    ) {
-        when (result) {
-            is ApiResult.Success -> {
-                PokemonDetails(
-                    pokemon = result.value)
+    when (val result = viewModel.pokemonState.collectAsState().value) {
+        is ApiResult.Success -> {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = modifier
+                    .verticalScroll(scrollState)
+            ) {
+                PokemonDetails(pokemon = result.value)
             }
-            is ApiResult.Failure -> {
-                val errorMessage = result.message ?: stringResource(id = R.string.unknown_error)
-                ErrorMessage(
-                    message = errorMessage)
-            }
-            is ApiResult.Loading -> {
-                PageLoader(modifier = Modifier.fillMaxSize())
-            }
+        }
+        is ApiResult.Failure -> {
+            ErrorMessage(
+                message = result.toErrorMessage(LocalContext.current, pokemonName),
+                modifier = modifier.fillMaxSize(),
+                onClickRetry = { viewModel.fetchDetails(pokemonId) })
+        }
+        is ApiResult.Loading -> {
+            PageLoader(modifier = modifier.fillMaxSize())
         }
     }
 }
@@ -133,8 +137,7 @@ fun PokemonDetails(
         ) {
             AsyncImage(
                 modifier = Modifier
-                    .size(250.dp)
-                    .padding(bottom = 4.dp),
+                    .size(250.dp),
                 model = pokemon.sprites.frontDefault,
                 contentDescription = null)
 
@@ -221,7 +224,7 @@ fun PokemonDetailsType(types: List<Type>) {
             .padding(18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        for(type in types) {
+        for (type in types) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -250,19 +253,34 @@ fun PokemonDetailsStats(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Base Stats:",
+            text = stringResource(id = R.string.stats),
             color = MaterialTheme.colorScheme.onSurface,
             fontSize = 18.sp,
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        for(stat in pokemon.stats) {
-            PokemonDetailsStatItem(
-                statName = stat.details.name,
-                statValue = stat.baseStat,
-                statMaxValue = maxBaseStat,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .height(intrinsicSize = IntrinsicSize.Max),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.SpaceAround,
+            ) {
+                for (stat in pokemon.stats) {
+                    Text(text = stat.details.name)
+                }
+            }
+            Column {
+                for (stat in pokemon.stats) {
+                    PokemonDetailsStatItem(
+                        statName = stat.details.name,
+                        statValue = stat.baseStat,
+                        statMaxValue = maxBaseStat,
+                    )
+                }
+            }
         }
     }
 }
@@ -277,12 +295,13 @@ fun PokemonDetailsStatItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(vertical = 6.dp)
             .height(30.dp)
             .clip(CircleShape)
             .background(Color.LightGray)
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxHeight()
@@ -291,10 +310,6 @@ fun PokemonDetailsStatItem(
                 .clip(CircleShape)
                 .padding(horizontal = 8.dp)
         ) {
-            Text(
-                text = statName,
-                color = MaterialTheme.colorScheme.onPrimary,
-            )
             Text(
                 text = (statProgress * statMaxValue).toInt().toString(),
                 color = MaterialTheme.colorScheme.onPrimary,
