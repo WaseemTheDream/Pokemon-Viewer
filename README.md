@@ -15,7 +15,7 @@ Clicking a pokemon takes us to the Pokemon details page where you can see key at
 <strong>Data Layer: </strong> Paging 3 <br>
 <strong>UI Architecture: </strong> MVVM + Jetpack Compose <br>
 <strong>Image Rendering: </strong> Coil <br>
-<strong>Unit Testing: <strong> OkHttp MockWebserver
+<strong>Unit Testing: </strong> OkHttp MockWebserver
 
 Retrofit was used to facilitate network requests and ensure type-safety for the responses. Hilt was used as the DI library due to its support for injecting within Android components such as Activities, ViewModels, and Composables. The AndroidX Paging 3 library was used to provide convenient support for pagination of the pokemons list and support error and loading states. Jetpack Compose was used due to its reactive programming model and superior developer experience compared to Android XML Views. MockWebServer was used to create isolated unit tests that don't depend on the network and allow me to provide mocked server responses for testing different conditions.
 
